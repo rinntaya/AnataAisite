@@ -5,7 +5,7 @@
 	path = engine/deps/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "engine/deps/imgui"]
-	path = engine/deps/imgui
+	path = engine/deps/it imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
 [submodule "engine/deps/glm"]
