@@ -1,0 +1,13 @@
+[submodule "engine/deps/spdlog"]
+	path = engine/deps/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "engine/deps/glfw"]
+	path = engine/deps/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "engine/deps/imgui"]
+	path = engine/deps/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "engine/deps/glm"]
+	path = engine/deps/glm
+	url = https://github.com/g-truc/glm.git

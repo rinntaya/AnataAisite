@@ -1,0 +1,46 @@
+#include "_atpch.h"
+#include "WindowsInput.h"
+
+#include "AnataAisite//Application.h"
+#include <GLFW/glfw3.h>
+
+namespace Aisite {
+
+    Input* Input::s_Instance = new WindowsInput();
+
+    bool WindowsInput::IsKeyPressedImpl(int keycode)
+    {
+        auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+        auto state = glfwGetKey(window, keycode);
+        return state == GLFW_PRESS || state == GLFW_REPEAT;
+    }
+
+    bool WindowsInput::IsMouseButtonPressedImpl(int button)
+    {
+        auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+        auto state = glfwGetMouseButton(window, button);
+        return state == GLFW_PRESS;
+    }
+
+    std::pair<double, double> WindowsInput::GetMousePositionImpl()
+    {
+        auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        return { xpos, ypos };
+    }
+
+    double WindowsInput::GetMouseXImpl()
+    {
+        auto[x, y] = GetMousePositionImpl();
+        return x;
+    }
+
+    double WindowsInput::GetMouseYImpl()
+    {
+        auto[x, y] = GetMousePositionImpl();
+        return y;
+    }
+
+}
