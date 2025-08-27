@@ -17,6 +17,8 @@ set(HEADERS
         include/AnataAisite/ImGuiLayer.h
         include/AnataAisite/Input.h
         include/AnataAisite/KeyCodes.h
+        src/renderer/GraphicsContext.h
+
 )
 
 set(SOURCES
@@ -28,6 +30,19 @@ set(SOURCES
         src/Layer.cpp
         src/LayerStack.cpp
         src/imgui/ImGuiLayer.cpp
+        src/platform/opengl/OpenGLContext.cpp
+        src/platform/opengl/OpenGLContext.h
+        src/renderer/Shader.cpp
+        include/AnataAisite/Renderer/Shader.h
+        src/renderer/Buffer.cpp
+        include/AnataAisite/Renderer/Buffer.h
+        src/renderer/VertexArray.cpp
+        include/AnataAisite/Renderer/VertexArray.h
+        src/renderer/RendererAPI.h
+        src/renderer/RenderCommand.cpp
+        src/renderer/RenderCommand.h
+        src/platform/opengl/OpenGLRendererAPI.cpp
+        src/platform/opengl/OpenGLRendererAPI.h
 )
 
 set(WINDOWS_FILES
@@ -35,13 +50,30 @@ set(WINDOWS_FILES
         src/platform/Windows/WindowsWindow.h
         src/platform/Windows/WindowsInput.cpp
         src/platform/Windows/WindowsInput.h
+        src/platform/opengl/OpenGLBuffer.cpp
+        src/platform/opengl/OpenGLBuffer.h
+        src/renderer/Renderer.cpp
+        include/AnataAisite/Renderer/Renderer.h
+        src/platform/opengl/OpenGLVertexArray.cpp
+        src/platform/opengl/OpenGLVertexArray.h
 )
 set(UNIX_FILES
-#        src/platform/Unix/UnixWindow.cpp
+
+        #        src/platform/Unix/UnixWindow.cpp
 #        src/platform/Unix/UnixWindow.h
 )
 
-add_library(Engine SHARED ${SOURCES} ${HEADERS} ${WINDOWS_FILES} ${UNIX_FILES})
+list(APPEND SOURCES
+        deps/imgui/imgui.cpp
+        deps/imgui/imgui_draw.cpp
+        deps/imgui/imgui_tables.cpp
+        deps/imgui/imgui_widgets.cpp
+        deps/imgui/imgui_demo.cpp
+        deps/imgui/backends/imgui_impl_opengl3.cpp
+        deps/imgui/backends/imgui_impl_glfw.cpp
+)
+
+add_library(Engine SHARED ${SOURCES} ${HEADERS})
 add_library(Aisite::Engine ALIAS Engine)
 target_sources(Engine
         PRIVATE
@@ -60,9 +92,13 @@ target_include_directories(Engine PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
-target_include_directories(Engine PRIVATE src)
-target_include_directories(Engine PRIVATE vendor)
-target_include_directories(Engine PRIVATE res)
+target_include_directories(Engine
+        PRIVATE src
+        PRIVATE vendor
+        PRIVATE res
+        PUBLIC deps/imgui
+        PRIVATE deps/imgui/backends
+)
 target_precompile_headers(Engine PUBLIC include/_atpch.h)
 
 
@@ -73,24 +109,23 @@ target_link_libraries(Engine PRIVATE glfw)
 add_subdirectory(deps/glad EXCLUDE_FROM_ALL)
 target_link_libraries(Engine PRIVATE glad)
 add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
-target_link_libraries(Engine PRIVATE glm)
+target_link_libraries(Engine PUBLIC  glm)
 
-add_library(imgui
-        deps/imgui/imgui.cpp
-        deps/imgui/imgui_draw.cpp
-        deps/imgui/imgui_tables.cpp
-        deps/imgui/imgui_widgets.cpp
-        deps/imgui/imgui_demo.cpp
-        deps/imgui/backends/imgui_impl_opengl3.cpp
-        deps/imgui/backends/imgui_impl_glfw.cpp
-)
-target_include_directories(imgui
-        PUBLIC deps/imgui
-        PUBLIC deps/imgui/backends
-        PUBLIC deps/glfw/include
-)
-target_link_libraries(Engine PRIVATE imgui)
-
+#add_library(imgui
+#        deps/imgui/imgui.cpp
+#        deps/imgui/imgui_draw.cpp
+#        deps/imgui/imgui_tables.cpp
+#        deps/imgui/imgui_widgets.cpp
+#        deps/imgui/imgui_demo.cpp
+#        deps/imgui/backends/imgui_impl_opengl3.cpp
+#        deps/imgui/backends/imgui_impl_glfw.cpp
+#)
+#target_include_directories(imgui
+#        PUBLIC deps/imgui
+#        PUBLIC deps/imgui/backends
+#        PRIVATE deps/glfw/include
+#)
+#target_link_libraries(Engine PUBLIC imgui)
 
 if (MSVC)
     set_target_properties(Engine PROPERTIES

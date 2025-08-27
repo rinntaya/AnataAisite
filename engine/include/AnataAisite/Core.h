@@ -11,6 +11,7 @@
 #else
     #define AISITE_API
 #endif
+#define IMGUI_API AISITE_API
 // ----------------------------------------
 
 

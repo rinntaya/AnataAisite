@@ -7,7 +7,7 @@
 
 namespace Aisite {
 
-    class AISITE_API LayerStack
+    class AISITE_API  LayerStack
     {
     public:
         LayerStack();
@@ -22,7 +22,8 @@ namespace Aisite {
         std::vector<Layer*>::iterator end() { return m_Layers.end(); }
     private:
         std::vector<Layer*> m_Layers;
-        std::vector<Layer*>::iterator m_LayerInsert;
+        // std::vector<Layer*>::iterator m_LayerInsert;
+        unsigned int m_LayerInsertIndex = 0;
     };
 
 }

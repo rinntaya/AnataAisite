@@ -1,10 +1,13 @@
 #pragma once
 
-#include "AnataAisite/Window.h"
-#include "AnataAisite/Core.h"
-#include "AnataAisite/Events/Event.h"
-#include "AnataAisite/Events/ApplicationEvent.h"
-#include "AnataAisite/LayerStack.h"
+#include "Window.h"
+#include "Core.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
+#include "LayerStack.h"
+#include "ImGuiLayer.h"
+#include "Renderer/Shader.h"
+#include "Renderer/VertexArray.h"
 
 
 namespace Aisite
@@ -21,7 +24,6 @@ namespace Aisite
         void PushOverlay(Layer* layer);
 
         inline Window& GetWindow() const { return *m_Window; }
-        inline float GetDPI() const { return m_DPI; }
         inline static Application& Get() { return *s_Instance; }
 
         void OnEvent(Event& e) ;
@@ -31,12 +33,15 @@ namespace Aisite
 
 
         std::unique_ptr<Window> m_Window;
+        ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
-        float m_DPI = 1.f;
+        float m_DPI = 1.5f;
 
         LayerStack m_LayerStack;
+
     private:
         static Application* s_Instance;
+
     };
 
 

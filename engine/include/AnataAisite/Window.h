@@ -13,6 +13,7 @@ namespace Aisite
     {
         std::string Title;
         unsigned int Width, Height;
+        float XDpi, YDpi;
 
         explicit WindowProps(std::string  title = "AnataAisite Engine / お願いい！愛して！！！",
                              const unsigned int width = 1280,
@@ -40,6 +41,7 @@ namespace Aisite
         virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
+        virtual float GetDpi(float* vec2 = nullptr) = 0;
 
         virtual void* GetNativeWindow() const = 0;
         static Window* Create(const WindowProps& props = WindowProps());

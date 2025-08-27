@@ -10,6 +10,7 @@
 #include "AnataAisite/Events/ApplicationEvent.h"
 #include "AnataAisite/Events/KeyEvent.h"
 #include "AnataAisite/Events/MouseEvent.h"
+#include "platform/opengl/OpenGLContext.h"
 
 // TODO: 当前直接使用ImGUI的方法，以后替换为自己的虚拟按键码
 static int ImGui_ImplGlfw_TranslateUntranslatedKey(int key, int scancode)
@@ -88,12 +89,13 @@ namespace Aisite
         }
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        float xscale, yscale;
-        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-        AT_CORE_DEBUG("first screen dpi X: {} Y: {}", xscale, yscale);
+        glfwGetMonitorContentScale(monitor, &m_DpiX, &m_DpiY);
+        AT_CORE_DEBUG("first screen dpi X: {} Y: {}", m_DpiX, m_DpiY);
 
-        m_Window = glfwCreateWindow((int) (props.Width), (int) (props.Height),
+        m_Window = glfwCreateWindow((int) (props.Width * m_DpiX), (int) (props.Height * m_DpiX),
                                     m_Data.Title.c_str(), nullptr, nullptr);
+        m_Context = new OpenGLContext(m_Window);
+
         int width, height, channels;
         if (unsigned char* pixels = stbi_load_from_memory(__engine_icon_png, (int) __engine_icon_png_len, &width,
                                                           &height,
@@ -106,9 +108,8 @@ namespace Aisite
             stbi_image_free(pixels);
         }
 
-        glfwMakeContextCurrent(m_Window);
-        const int status = gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-        AT_CORE_ASSERT(status, "Failed to initialize Glad!");
+
+        m_Context->Init();
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
 
@@ -200,7 +201,7 @@ namespace Aisite
     void WindowsWindow::OnUpdate()
     {
         glfwPollEvents();
-        glfwSwapBuffers(m_Window);
+        m_Context->SwapBuffers();
     }
 
     void WindowsWindow::SetVSync(const bool enabled)

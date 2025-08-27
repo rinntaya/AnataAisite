@@ -1,9 +1,11 @@
 #pragma once
 #include "AnataAisite/Window.h"
+#include "renderer/GraphicsContext.h"
 
 struct GLFWwindow;
 namespace Aisite
 {
+
     class WindowsWindow : public Window
     {
     public:
@@ -19,8 +21,13 @@ namespace Aisite
         inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
         void SetVSync(bool enabled) override;
         bool IsVSync() const override;
+        inline float GetDpi(float* vec2) override
+        {
+            if (vec2) vec2[0] = m_DpiX, vec2[1] = m_DpiY;
+            return m_DpiX;
+        };
 
-        inline virtual void* GetNativeWindow() const { return m_Window; }
+        inline void* GetNativeWindow() const override { return m_Window; }
 
     private:
         virtual void Init(const WindowProps& props);
@@ -28,7 +35,8 @@ namespace Aisite
 
 
     private:
-        GLFWwindow* m_Window{nullptr};
+        GLFWwindow* m_Window;
+        GraphicsContext* m_Context;
 
         struct WindowData
         {
@@ -39,6 +47,7 @@ namespace Aisite
             EventCallbackFn EventCallback;
         };
 
+        float m_DpiX, m_DpiY;
         WindowData m_Data;
     };
 
