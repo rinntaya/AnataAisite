@@ -1,10 +1,11 @@
 #include "icon/engine_icon.h"
-#include "stb_image.h"
+#include "stb/stb_image.h"
 
 #include "WindowsWindow.h"
 
-#include <glad/glad.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 #include "AnataAisite/Log.h"
 #include "AnataAisite/Events/ApplicationEvent.h"
@@ -108,10 +109,13 @@ namespace Aisite
             stbi_image_free(pixels);
         }
 
+        HWND hwnd = glfwGetWin32Window(m_Window);
+        ImmAssociateContext(hwnd, NULL); // 禁用 IME
 
         m_Context->Init();
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
+
 
 
         // Set GLFW callbacks
@@ -192,7 +196,6 @@ namespace Aisite
             data->EventCallback(event);
         });
     }
-
     void WindowsWindow::Shutdown()
     {
         glfwDestroyWindow(m_Window);
@@ -202,6 +205,7 @@ namespace Aisite
     {
         glfwPollEvents();
         m_Context->SwapBuffers();
+        // TitleFps();
     }
 
     void WindowsWindow::SetVSync(const bool enabled)
@@ -218,4 +222,6 @@ namespace Aisite
     {
         return m_Data.VSync;
     }
+
+
 }

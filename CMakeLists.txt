@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(Aisite)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 if (MSVC)
     add_compile_options(/utf-8)
 #    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

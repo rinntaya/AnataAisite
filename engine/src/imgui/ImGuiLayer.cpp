@@ -8,7 +8,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 
@@ -137,32 +136,44 @@ namespace Aisite
         ImGui::DestroyContext();
     }
 
+
     void ImGuiLayer::OnDebugUIRender()
     {
-        ImGuiIO io = ImGui::GetIO();
-
-        static bool show = true;
-        if (show) ImGui::ShowDemoWindow(&show);
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show); // Edit bools storing our window open/close state
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-
-            if (ImGui::Button("Button"))
-                // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
+        static int location = 0;
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
+                                        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+                                        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+        if (location >= 0) {
+            const float PAD = 10.0f;
+            const ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
+            ImVec2 work_size = viewport->WorkSize;
+            ImVec2 window_pos, window_pos_pivot;
+            window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
+            window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
+            window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
+            window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
+            ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            window_flags |= ImGuiWindowFlags_NoMove;
         }
+
+        ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+        if (ImGui::Begin("Debug Overlay", nullptr, window_flags)) {
+            ImGui::Text("Debug Overlay");
+            ImGui::Separator();
+            ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            if (ImGui::BeginPopupContextWindow()) {
+                if (ImGui::MenuItem("Custom", NULL, location == -1)) location = -1;
+                if (ImGui::MenuItem("Top-left", NULL, location == 0)) location = 0;
+                if (ImGui::MenuItem("Top-right", NULL, location == 1)) location = 1;
+                if (ImGui::MenuItem("Bottom-left", NULL, location == 2)) location = 2;
+                if (ImGui::MenuItem("Bottom-right", NULL, location == 3)) location = 3;
+                ImGui::EndPopup();
+            }
+        }
+        ImGui::End();
     }
 
     void ImGuiLayer::Begin()

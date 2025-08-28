@@ -1,13 +1,13 @@
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 
 #include "AnataAisite/Application.h"
 #include "AnataAisite/ImGuiLayer.h"
+#include "renderer/RenderCommand.h"
 
 namespace Aisite
 {
-#define BIND_EVENT_FN(x) std::bind_front(&Application::x, this)
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
     Application* Application::s_Instance = nullptr;
 
     void Application::PushLayer(Layer* layer)
@@ -41,19 +41,27 @@ namespace Aisite
    void Application::Run()
     {
         while (m_Running) {
-            glClearColor(.1f, .1f, .1f, 0);
-            glClear(GL_COLOR_BUFFER_BIT);
+            RenderCommand::SetClearColor({.1f, .1f, .1f, 0});
+            RenderCommand::Clear();
+
+            const float time = (float)glfwGetTime();
+            const Timestep timestep = time - m_LastFrameTime;
+            m_LastFrameTime = time;
+
+            m_UnSimulatedTime += timestep;
+            while (m_UnSimulatedTime >= FixedDeltaTime)
+                for (Layer* layer: m_LayerStack) layer->OnFixedUpdate(),
+                m_UnSimulatedTime -= FixedDeltaTime;
 
 
-            for (Layer* layer: m_LayerStack) layer->OnUpdate();
-
+            for (Layer* layer: m_LayerStack) layer->OnUpdate(timestep);
             m_ImGuiLayer->Begin();
                 for (Layer* layer: m_LayerStack) layer->OnDebugUIRender();
             m_ImGuiLayer->End();
+
             m_Window->OnUpdate();
         }
     }
-
 
 
 
@@ -65,12 +73,8 @@ namespace Aisite
 
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+        // m_Window->SetVSync(false);
 
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        float xscale, yscale;
-        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-
-        m_DPI = xscale;
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
     }

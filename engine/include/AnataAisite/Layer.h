@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Timestep.h"
 #include "Events/Event.h"
 
 namespace Aisite {
@@ -13,7 +14,9 @@ namespace Aisite {
 
         virtual void OnAttach() {}
         virtual void OnDetach() {}
-        virtual void OnUpdate() {}
+        virtual void OnUpdate(Timestep deltaTime) {}
+        virtual void OnFixedUpdate() {}
+
         virtual void OnDebugUIRender() {}
         virtual void OnEvent(Event& event) {}
 

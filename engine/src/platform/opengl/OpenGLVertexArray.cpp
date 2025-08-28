@@ -8,9 +8,9 @@ namespace Aisite
     {
         switch (type) {
             case ShaderDataType::Float:
-            case ShaderDataType::Vec2:
-            case ShaderDataType::Vec3:
-            case ShaderDataType::Vec4:
+            case ShaderDataType::Float2:
+            case ShaderDataType::Float3:
+            case ShaderDataType::Float4:
             case ShaderDataType::Mat3:
             case ShaderDataType::Mat4:
                 return GL_FLOAT;
@@ -48,7 +48,7 @@ namespace Aisite
         glBindVertexArray(0);
     }
 
-    void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
+    void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
     {
         AT_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
@@ -70,7 +70,7 @@ namespace Aisite
         m_VertexBuffers.push_back(vertexBuffer);
     }
 
-    void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+    void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
     {
         glBindVertexArray(m_RendererID);
         indexBuffer->Bind();

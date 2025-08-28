@@ -18,11 +18,12 @@ set(HEADERS
         include/AnataAisite/Input.h
         include/AnataAisite/KeyCodes.h
         src/renderer/GraphicsContext.h
+        include/AnataAisite/Timestep.h
 
 )
 
 set(SOURCES
-        vendor/stb_image.cpp
+        vendor/stb/stb_image.cpp
 
         src/Application.cpp
         src/Log.cpp
@@ -43,6 +44,16 @@ set(SOURCES
         src/renderer/RenderCommand.h
         src/platform/opengl/OpenGLRendererAPI.cpp
         src/platform/opengl/OpenGLRendererAPI.h
+
+
+        src/renderer/Camera.cpp
+        include/AnataAisite/Renderer/Camera.h
+        src/platform/opengl/OpenGLShader.cpp
+        src/platform/opengl/OpenGLShader.h
+        src/renderer/Texture.cpp
+        include/AnataAisite/Renderer/Texture.h
+        src/platform/opengl/OpenGLTexture.cpp
+        src/platform/opengl/OpenGLTexture.h
 )
 
 set(WINDOWS_FILES
@@ -93,6 +104,7 @@ target_include_directories(Engine PUBLIC
         $<INSTALL_INTERFACE:include>
 )
 target_include_directories(Engine
+        PUBLIC src
         PRIVATE src
         PRIVATE vendor
         PRIVATE res

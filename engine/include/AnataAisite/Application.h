@@ -31,16 +31,18 @@ namespace Aisite
     private:
         bool OnWindowClose(const WindowCloseEvent& _);
 
+    private:
+        static Application* s_Instance;
 
         std::unique_ptr<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
-        float m_DPI = 1.5f;
 
         LayerStack m_LayerStack;
-
-    private:
-        static Application* s_Instance;
+        float m_LastFrameTime = 0.0f;
+        float m_UnSimulatedTime = 0.0f;
+    public:
+        float FixedDeltaTime = 0.01f;
 
     };
 

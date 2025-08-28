@@ -1,5 +1,7 @@
 
 #pragma once
+#include "Camera.h"
+#include "Shader.h"
 #include "VertexArray.h"
 
 namespace Aisite {
@@ -15,15 +17,22 @@ namespace Aisite {
 
     public:
 
-        static void BeginScene();
+        static void BeginScene(OrthographicCamera& camera);
         static void EndScene();
 
-        static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+        static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+
 
         inline static API GetAPI() { return s_API; }
 
     private:
         static API s_API;
+        struct SceneData
+        {
+            glm::mat4 ViewProjectionMatrix;
+        };
+
+        static SceneData* s_SceneData;
     };
 
 

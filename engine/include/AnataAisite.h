@@ -5,14 +5,33 @@
 #include "AnataAisite/Application.h"
 #include "AnataAisite/Log.h"
 
-// ---Pre Layout---------------------------
+
+///// Pre Layout //////////////////////////////////////////////////
 #include "AnataAisite/Layer.h"
 #include "AnataAisite/ImGuiLayer.h"
-// ----------------------------------------
+///////////////////////////////////////////////////////////////////
 
+
+///// Event & Input ///////////////////////////////////////////////
+#include "AnataAisite/Timestep.h"
 #include "AnataAisite/Input.h"
 #include "AnataAisite/KeyCodes.h"
+///////////////////////////////////////////////////////////////////
 
-// ---Entry Point--------------------------
+
+
+///// Renderer ////////////////////////////////////////////////////
+#include "AnataAisite/Renderer/Renderer.h"
+
+#include "AnataAisite/Renderer/Buffer.h"
+#include "AnataAisite/Renderer/Shader.h"
+#include "AnataAisite/Renderer/Texture.h"
+#include "AnataAisite/Renderer/VertexArray.h"
+
+#include "AnataAisite/Renderer/Camera.h"
+///////////////////////////////////////////////////////////////////
+
+
+///// Entry Point /////////////////////////////////////////////////
 #include "AnataAisite/EntryPoint.h"
-// ----------------------------------------
+///////////////////////////////////////////////////////////////////

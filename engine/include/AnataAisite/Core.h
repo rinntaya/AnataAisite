@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ---Define AISITEAPI---------------------
+///// Define Export ///////////////////////////////////////////////
 #ifdef _WIN32
     #ifdef AISITE_EXPORTS
       #define AISITE_API __declspec(dllexport)
@@ -13,6 +13,7 @@
 #endif
 #define IMGUI_API AISITE_API
 // ----------------------------------------
+///////////////////////////////////////////////////////////////////
 
 
 #ifdef _AT_DEBUG
@@ -31,3 +32,14 @@
 #define BIT(x) (1 << x)
 
 #define AT_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+#include <memory>
+
+namespace Aisite {
+
+    template<typename T>
+    using Scope = std::unique_ptr<T>;
+
+    template<typename T>
+    using Ref = std::shared_ptr<T>;
+
+}

@@ -1,5 +1,6 @@
 #pragma once
 #include "AnataAisite/Window.h"
+#include "GLFW/glfw3.h"
 #include "renderer/GraphicsContext.h"
 
 struct GLFWwindow;
@@ -32,6 +33,26 @@ namespace Aisite
     private:
         virtual void Init(const WindowProps& props);
         virtual void Shutdown();
+
+
+        inline void TitleFps() const
+        {
+            static double time0 = glfwGetTime();
+            static double time1;
+            static double dt;
+            static int dframe = -1;
+            static std::stringstream info;
+            time1 = glfwGetTime();
+            dframe++;
+            if ((dt = time1 - time0) >= 1) {
+                info.precision(1);
+                info << m_Data.Title << "                 " << std::fixed << dframe / dt << " FPS";
+                glfwSetWindowTitle(m_Window, info.str().c_str());
+                info.str(""); //别忘了在设置完窗口标题后清空所用的stringstream
+                time0 = time1;
+                dframe = 0;
+            }
+        }
 
 
     private:
