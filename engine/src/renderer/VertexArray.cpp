@@ -6,12 +6,12 @@
 
 namespace Aisite {
 
-    VertexArray* VertexArray::Create()
+    Ref<VertexArray> VertexArray::Create()
     {
         switch (Renderer::GetAPI())
         {
             case Renderer::API::None:    AT_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-            case Renderer::API::OpenGL:  return new OpenGLVertexArray();
+            case Renderer::API::OpenGL:  return std::make_shared<OpenGLVertexArray>();
         }
 
         AT_CORE_ASSERT(false, "Unknown RendererAPI!");

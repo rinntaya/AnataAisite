@@ -41,7 +41,7 @@ set(SOURCES
         include/AnataAisite/Renderer/VertexArray.h
         src/renderer/RendererAPI.h
         src/renderer/RenderCommand.cpp
-        src/renderer/RenderCommand.h
+        include/AnataAisite/Renderer/RenderCommand.h
         src/platform/opengl/OpenGLRendererAPI.cpp
         src/platform/opengl/OpenGLRendererAPI.h
 
@@ -54,6 +54,10 @@ set(SOURCES
         include/AnataAisite/Renderer/Texture.h
         src/platform/opengl/OpenGLTexture.cpp
         src/platform/opengl/OpenGLTexture.h
+        include/AnataAisite/CameraController.h
+        src/CameraController.cpp
+        src/renderer/Renderer2D.cpp
+        include/AnataAisite/Renderer/Renderer2D.h
 )
 
 set(WINDOWS_FILES
@@ -114,13 +118,13 @@ target_include_directories(Engine
 target_precompile_headers(Engine PUBLIC include/_atpch.h)
 
 
-add_subdirectory(deps/spdlog EXCLUDE_FROM_ALL)
+add_subdirectory(deps/spdlog)
 target_link_libraries(Engine PUBLIC spdlog::spdlog)
-add_subdirectory(deps/glfw EXCLUDE_FROM_ALL)
+add_subdirectory(deps/glfw)
 target_link_libraries(Engine PRIVATE glfw)
-add_subdirectory(deps/glad EXCLUDE_FROM_ALL)
+add_subdirectory(deps/glad)
 target_link_libraries(Engine PRIVATE glad)
-add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
+add_subdirectory(deps/glm)
 target_link_libraries(Engine PUBLIC  glm)
 
 #add_library(imgui

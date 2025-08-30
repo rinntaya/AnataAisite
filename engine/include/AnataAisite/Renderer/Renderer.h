@@ -16,6 +16,7 @@ namespace Aisite {
         };
 
     public:
+		static void Init();
 
         static void BeginScene(OrthographicCamera& camera);
         static void EndScene();
@@ -25,6 +26,7 @@ namespace Aisite {
 
         inline static API GetAPI() { return s_API; }
 
+        static void OnWindowResize(uint32_t width, uint32_t height);
     private:
         static API s_API;
         struct SceneData

@@ -109,8 +109,8 @@ namespace Aisite
             stbi_image_free(pixels);
         }
 
-        HWND hwnd = glfwGetWin32Window(m_Window);
-        ImmAssociateContext(hwnd, NULL); // 禁用 IME
+        // HWND hwnd = glfwGetWin32Window(m_Window);
+        // ImmAssociateContext(hwnd, NULL); // 禁用 IME
 
         m_Context->Init();
         glfwSetWindowUserPointer(m_Window, &m_Data);

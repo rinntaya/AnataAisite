@@ -30,6 +30,7 @@ namespace Aisite
 
     private:
         bool OnWindowClose(const WindowCloseEvent& _);
+        bool OnWindowResize(WindowResizeEvent& e);
 
     private:
         static Application* s_Instance;
@@ -37,6 +38,8 @@ namespace Aisite
         std::unique_ptr<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
+        bool m_Minimized = false;
+
 
         LayerStack m_LayerStack;
         float m_LastFrameTime = 0.0f;

@@ -3,7 +3,8 @@
 
 #include "AnataAisite/Application.h"
 #include "AnataAisite/ImGuiLayer.h"
-#include "renderer/RenderCommand.h"
+#include "AnataAisite/Renderer/RenderCommand.h"
+#include "AnataAisite/Renderer/Renderer.h"
 
 namespace Aisite
 {
@@ -24,6 +25,7 @@ namespace Aisite
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
             (*--it)->OnEvent(e);
@@ -37,13 +39,24 @@ namespace Aisite
         return true;
     }
 
+    bool Application::OnWindowResize(WindowResizeEvent& e)
+    {
+        if (e.GetWidth() == 0 || e.GetHeight() == 0)
+        {
+            m_Minimized = true;
+            return false;
+        }
 
-   void Application::Run()
+        m_Minimized = false;
+        Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+        return false;
+    }
+
+
+    void Application::Run()
     {
         while (m_Running) {
-            RenderCommand::SetClearColor({.1f, .1f, .1f, 0});
-            RenderCommand::Clear();
-
             const float time = (float)glfwGetTime();
             const Timestep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
@@ -54,7 +67,8 @@ namespace Aisite
                 m_UnSimulatedTime -= FixedDeltaTime;
 
 
-            for (Layer* layer: m_LayerStack) layer->OnUpdate(timestep);
+
+            if (!m_Minimized) for (Layer* layer : m_LayerStack) layer->OnUpdate(timestep);
             m_ImGuiLayer->Begin();
                 for (Layer* layer: m_LayerStack) layer->OnDebugUIRender();
             m_ImGuiLayer->End();
@@ -74,6 +88,8 @@ namespace Aisite
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
         // m_Window->SetVSync(false);
+
+        Renderer::Init();
 
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);

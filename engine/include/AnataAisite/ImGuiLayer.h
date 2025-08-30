@@ -12,7 +12,6 @@ namespace Aisite {
 
         void OnAttach() override;
         void OnDetach() override;
-        void OnDebugUIRender() override;
 
         void Begin();
         void End();
