@@ -7,13 +7,14 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#include "AnataAisite/Log.h"
+#pragma comment(lib, "dwmapi.lib")
+#include <dwmapi.h>
+#include "AnataAisite/Debug/Log.h"
 #include "AnataAisite/Events/ApplicationEvent.h"
 #include "AnataAisite/Events/KeyEvent.h"
 #include "AnataAisite/Events/MouseEvent.h"
 #include "platform/opengl/OpenGLContext.h"
 
-// TODO: 当前直接使用ImGUI的方法，以后替换为自己的虚拟按键码
 static int ImGui_ImplGlfw_TranslateUntranslatedKey(int key, int scancode)
 {
 #if GLFW_HAS_GETKEYNAME && !defined(EMSCRIPTEN_USE_EMBEDDED_GLFW3)
@@ -58,23 +59,29 @@ namespace Aisite
     }
 
 
-    Window* Window::Create(const WindowProps& props)
+    Ref<Window> Window::Create(const WindowProps& props)
     {
-        return new WindowsWindow(props);
+        return CreateRef<WindowsWindow>(props);
     }
 
     WindowsWindow::WindowsWindow(const WindowProps& props)
     {
+        AT_PROFILE_FUNCTION();
+
         WindowsWindow::Init(props);
     }
 
     WindowsWindow::~WindowsWindow()
     {
+        AT_PROFILE_FUNCTION();
+
         WindowsWindow::Shutdown();
     }
 
     void WindowsWindow::Init(const WindowProps& props)
     {
+        AT_PROFILE_FUNCTION();
+
         m_Data.Title = props.Title;
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
@@ -109,7 +116,9 @@ namespace Aisite
             stbi_image_free(pixels);
         }
 
-        // HWND hwnd = glfwGetWin32Window(m_Window);
+        HWND hwnd = glfwGetWin32Window(m_Window);
+        BOOL useDarkMode = TRUE;
+        DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
         // ImmAssociateContext(hwnd, NULL); // 禁用 IME
 
         m_Context->Init();
@@ -136,7 +145,7 @@ namespace Aisite
         });
         glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
             const WindowData* data = (WindowData *) glfwGetWindowUserPointer(window);
-            const int keycode = ImGui_ImplGlfw_TranslateUntranslatedKey(key, scancode);
+            const KeyCode keycode = static_cast<KeyCode>(ImGui_ImplGlfw_TranslateUntranslatedKey(key, scancode));
 
             switch (action) {
                 case GLFW_PRESS: {
@@ -166,7 +175,7 @@ namespace Aisite
 
         glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) {
             const WindowData* data = (WindowData *) glfwGetWindowUserPointer(window);
-            const int keycode = button;
+            const MouseCode keycode = static_cast<MouseCode>(button);
 
             switch (action) {
                 case GLFW_PRESS: {
@@ -198,11 +207,15 @@ namespace Aisite
     }
     void WindowsWindow::Shutdown()
     {
+        AT_PROFILE_FUNCTION();
+
         glfwDestroyWindow(m_Window);
     }
 
     void WindowsWindow::OnUpdate()
     {
+        AT_PROFILE_FUNCTION();
+
         glfwPollEvents();
         m_Context->SwapBuffers();
         // TitleFps();
@@ -210,6 +223,8 @@ namespace Aisite
 
     void WindowsWindow::SetVSync(const bool enabled)
     {
+        AT_PROFILE_FUNCTION();
+
         if (enabled)
             glfwSwapInterval(1);
         else

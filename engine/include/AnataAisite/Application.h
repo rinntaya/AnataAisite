@@ -6,8 +6,6 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 #include "ImGuiLayer.h"
-#include "Renderer/Shader.h"
-#include "Renderer/VertexArray.h"
 
 
 namespace Aisite
@@ -15,15 +13,17 @@ namespace Aisite
     class AISITE_API Application
     {
     public:
-        Application();
+        Application(const std::string& name = "Aisite Player");
         ~Application();
 
         void Run();
+        void Close();
 
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* layer);
 
         inline Window& GetWindow() const { return *m_Window; }
+        ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
         inline static Application& Get() { return *s_Instance; }
 
         void OnEvent(Event& e) ;
@@ -35,7 +35,7 @@ namespace Aisite
     private:
         static Application* s_Instance;
 
-        std::unique_ptr<Window> m_Window;
+        Ref<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         bool m_Minimized = false;

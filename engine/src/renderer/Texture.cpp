@@ -7,6 +7,7 @@ namespace Aisite {
 
     Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
     {
+
         switch (Renderer::GetAPI())
         {
             case Renderer::API::None:    AT_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;

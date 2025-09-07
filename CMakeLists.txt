@@ -20,6 +20,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/cmake-build-target)  # Âè
 #endforeach()
 
 add_subdirectory(engine)
+add_subdirectory(editor)
 add_subdirectory(sandbox)
 
 if (MSVC)

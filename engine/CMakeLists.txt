@@ -6,7 +6,7 @@ set(HEADERS
         include/AnataAisite.h
         include/AnataAisite/EntryPoint.h
         include/AnataAisite/Application.h
-        include/AnataAisite/Log.h
+        include/AnataAisite/Debug/Log.h
         include/AnataAisite/Events/Event.h
         include/AnataAisite/Events/KeyEvent.h
         include/AnataAisite/Events/MouseEvent.h
@@ -19,11 +19,13 @@ set(HEADERS
         include/AnataAisite/KeyCodes.h
         src/renderer/GraphicsContext.h
         include/AnataAisite/Timestep.h
+        include/AnataAisite/Debug/Instrumentor.h
 
 )
 
 set(SOURCES
         vendor/stb/stb_image.cpp
+        vendor/entt/entt.hpp
 
         src/Application.cpp
         src/Log.cpp
@@ -54,23 +56,36 @@ set(SOURCES
         include/AnataAisite/Renderer/Texture.h
         src/platform/opengl/OpenGLTexture.cpp
         src/platform/opengl/OpenGLTexture.h
-        include/AnataAisite/CameraController.h
-        src/CameraController.cpp
+        src/platform/opengl/OpenGLBuffer.cpp
+        src/platform/opengl/OpenGLBuffer.h
+        src/platform/opengl/OpenGLVertexArray.cpp
+        src/platform/opengl/OpenGLVertexArray.h
+        include/AnataAisite/Renderer/CameraController.h
+        src/renderer/CameraController.cpp
+        src/renderer/Renderer.cpp
+        include/AnataAisite/Renderer/Renderer.h
         src/renderer/Renderer2D.cpp
         include/AnataAisite/Renderer/Renderer2D.h
+        include/AnataAisite/Renderer/Framebuffer.h
+        src/renderer/Framebuffer.cpp
+        src/platform/opengl/OpenGLFramebuffer.cpp
+        src/platform/opengl/OpenGLFramebuffer.h
+        include/AnataAisite/Scene/Scene.cpp
+        include/AnataAisite/Scene/Scene.h
+        include/AnataAisite/Scene/Components.h
+        include/AnataAisite/Scene/Entity.cpp
+        include/AnataAisite/Scene/Entity.h
+        include/AnataAisite/Scene/SceneCamera.cpp
+        include/AnataAisite/Scene/SceneCamera.h
+        include/AnataAisite/Scene/ScriptableEntity.h
+        include/AnataAisite/PlatformDetection.h
+        include/AnataAisite/Debug/Assert.h
 )
 
 set(WINDOWS_FILES
         src/platform/Windows/WindowsWindow.cpp
         src/platform/Windows/WindowsWindow.h
         src/platform/Windows/WindowsInput.cpp
-        src/platform/Windows/WindowsInput.h
-        src/platform/opengl/OpenGLBuffer.cpp
-        src/platform/opengl/OpenGLBuffer.h
-        src/renderer/Renderer.cpp
-        include/AnataAisite/Renderer/Renderer.h
-        src/platform/opengl/OpenGLVertexArray.cpp
-        src/platform/opengl/OpenGLVertexArray.h
 )
 set(UNIX_FILES
 
@@ -110,12 +125,13 @@ target_include_directories(Engine PUBLIC
 target_include_directories(Engine
         PUBLIC src
         PRIVATE src
-        PRIVATE vendor
         PRIVATE res
+        PUBLIC vendor
         PUBLIC deps/imgui
         PRIVATE deps/imgui/backends
 )
 target_precompile_headers(Engine PUBLIC include/_atpch.h)
+
 
 
 add_subdirectory(deps/spdlog)

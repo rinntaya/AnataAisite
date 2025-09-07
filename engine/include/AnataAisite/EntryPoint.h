@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Application.h"
-#include "Log.h"
+#include "Debug/Log.h"
+#include "Debug/Instrumentor.h"
 
 
 // ---Entry Point--------------------------
@@ -17,9 +18,17 @@ int main(int argc, char* argv[])
     AT_CORE_WARN("Initlized Log!");
     AT_INFO("Hello from {}!", 1);
 
+    AT_PROFILE_BEGIN_SESSION("Startup", "TracingProfile-Startup.json");
     const auto app = Aisite::CreateApplication();
+    AT_PROFILE_END_SESSION();
+
+    AT_PROFILE_BEGIN_SESSION("Runtime", "TracingProfile-Runtime.json");
     app->Run();
+    AT_PROFILE_END_SESSION();
+
+    AT_PROFILE_BEGIN_SESSION("Shutdown", "TracingProfile-Shutdown.json");
     delete app;
+    AT_PROFILE_END_SESSION();
 }
 // ----------------------------------------
 

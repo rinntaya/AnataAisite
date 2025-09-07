@@ -1,7 +1,8 @@
 #pragma once
 
 #include <AnataAisite.h>
-#include "AnataAisite/CameraController.h"
+#include "../../engine/include/AnataAisite/Renderer/CameraController.h"
+#include "AnataAisite/Renderer/Framebuffer.h"
 
 class Sandbox2D : public Aisite::Layer
 {
@@ -20,6 +21,7 @@ private:
 
 
     Aisite::Ref<Aisite::Texture2D> m_CheckerboardTexture;
+    Aisite::Ref<Aisite::Framebuffer> m_Framebuffer;
     struct ProfileResult
     {
         const char* Name;
@@ -27,7 +29,6 @@ private:
     };
 
     std::vector<ProfileResult> m_ProfileResults;
-
 
     glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 };

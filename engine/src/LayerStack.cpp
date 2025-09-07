@@ -1,6 +1,8 @@
 
 #include "AnataAisite/LayerStack.h"
 
+#include "AnataAisite/Application.h"
+
 namespace Aisite {
 
     LayerStack::LayerStack()
@@ -9,9 +11,10 @@ namespace Aisite {
 
     LayerStack::~LayerStack()
     {
-        for (Layer* layer : m_Layers)
-            // layer->OnDetach(),
+        for (Layer* layer : m_Layers) {
+            layer->OnDetach();
             delete layer;
+        }
     }
 
     void LayerStack::PushLayer(Layer* layer)

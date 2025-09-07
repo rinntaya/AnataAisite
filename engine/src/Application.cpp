@@ -13,24 +13,27 @@ namespace Aisite
 
     void Application::PushLayer(Layer* layer)
     {
+        AT_PROFILE_FUNCTION();
         m_LayerStack.PushLayer(layer);
         layer->OnAttach();
     }
     void Application::PushOverlay(Layer* layer)
     {
+        AT_PROFILE_FUNCTION();
         m_LayerStack.PushOverlay(layer);
         layer->OnAttach();
     }
     void Application::OnEvent(Event& e)
     {
+        AT_PROFILE_FUNCTION();
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
-            (*--it)->OnEvent(e);
             if (e.Handled)
                 break;
+            (*--it)->OnEvent(e);
         }
     }
     bool Application::OnWindowClose(const WindowCloseEvent& _)
@@ -41,6 +44,8 @@ namespace Aisite
 
     bool Application::OnWindowResize(WindowResizeEvent& e)
     {
+        AT_PROFILE_FUNCTION();
+
         if (e.GetWidth() == 0 || e.GetHeight() == 0)
         {
             m_Minimized = true;
@@ -56,7 +61,12 @@ namespace Aisite
 
     void Application::Run()
     {
+        AT_PROFILE_FUNCTION();
+
         while (m_Running) {
+
+            AT_PROFILE_SCOPE("RunLoop");
+
             const float time = (float)glfwGetTime();
             const Timestep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
@@ -68,24 +78,34 @@ namespace Aisite
 
 
 
-            if (!m_Minimized) for (Layer* layer : m_LayerStack) layer->OnUpdate(timestep);
+            if (!m_Minimized) {
+                AT_PROFILE_SCOPE("LayerStack OnUpdate");
+                for (Layer* layer : m_LayerStack) layer->OnUpdate(timestep);
+            };
             m_ImGuiLayer->Begin();
+            {
+                AT_PROFILE_SCOPE("LayerStack OnDebugUIRender");
                 for (Layer* layer: m_LayerStack) layer->OnDebugUIRender();
+            }
             m_ImGuiLayer->End();
 
             m_Window->OnUpdate();
         }
     }
 
-
-
-
-    Application::Application()
+    void Application::Close()
     {
+		m_Running = false;
+    }
+
+
+    Application::Application(const std::string& name)
+    {
+        AT_PROFILE_FUNCTION();
         AT_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
-        m_Window = std::unique_ptr<Window>(Window::Create());
+        m_Window = Window::Create(WindowProps(name));
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
         // m_Window->SetVSync(false);
 
@@ -94,5 +114,8 @@ namespace Aisite
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
     }
-    Application::~Application() = default;
+    Application::~Application() {
+        AT_PROFILE_FUNCTION();
+        Renderer::Shutdown();
+    };
 }

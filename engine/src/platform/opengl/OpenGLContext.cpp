@@ -13,6 +13,8 @@ Aisite::OpenGLContext::OpenGLContext(GLFWwindow* window)
 
 void Aisite::OpenGLContext::Init()
 {
+    AT_PROFILE_FUNCTION();
+
     glfwMakeContextCurrent(m_WindowHandle);
     const int status = gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     AT_CORE_ASSERT(status, "Failed to initialize Glad!");
@@ -28,11 +30,12 @@ void Aisite::OpenGLContext::Init()
     AT_CORE_INFO("      Renderer: {0}", (const char*)glGetString(GL_RENDERER));
     AT_CORE_INFO("      Version: {0}", (const char*)glGetString(GL_VERSION));
 
+    AT_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5), "Requires at least OpenGL version 4.5!");
 }
 
 void Aisite::OpenGLContext::SwapBuffers()
 {
-
+    AT_PROFILE_FUNCTION();
 
     glfwSwapBuffers(m_WindowHandle);
 }

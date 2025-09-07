@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event.h"
+#include "AnataAisite/KeyCodes.h"
 
 
 namespace Aisite {
@@ -49,23 +50,24 @@ namespace Aisite {
 		double m_XOffset, m_YOffset;
 	};
 
+
 	class AISITE_API MouseButtonEvent : public Event
 	{
 	public:
-		inline int GetMouseButton() const { return m_Button; }
+		inline MouseCode GetMouseButton() const { return m_Button; }
 
-		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
 	protected:
-		explicit MouseButtonEvent(int button)
+		explicit MouseButtonEvent(MouseCode button)
 			: m_Button(button) {}
 
-		int m_Button;
+		MouseCode m_Button;
 	};
 
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		explicit MouseButtonPressedEvent(int button)
+		explicit MouseButtonPressedEvent(MouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override
@@ -81,7 +83,7 @@ namespace Aisite {
 	class AISITE_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		explicit MouseButtonReleasedEvent(int button)
+		explicit MouseButtonReleasedEvent(MouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override

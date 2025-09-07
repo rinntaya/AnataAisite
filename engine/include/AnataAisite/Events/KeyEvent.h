@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event.h"
+#include "AnataAisite/KeyCodes.h"
 
 
 namespace Aisite {
@@ -8,23 +9,23 @@ namespace Aisite {
     class AISITE_API KeyEvent : public Event
     {
     public:
-        [[nodiscard]] inline int GetKeyCode() const { return m_KeyCode; }
+        [[nodiscard]] inline KeyCode GetKeyCode() const { return m_KeyCode; }
 
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
     protected:
-        explicit KeyEvent(int keycode)
+        explicit KeyEvent(KeyCode keycode)
             : m_KeyCode(keycode) {}
 
-        int m_KeyCode;
+        KeyCode m_KeyCode;
     };
 
     class AISITE_API KeyPressedEvent final : public KeyEvent
     {
     public:
-        KeyPressedEvent(const int keycode, int repeatCount)
+        KeyPressedEvent(const KeyCode keycode, uint16_t repeatCount)
             : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
-        [[nodiscard]] inline int GetRepeatCount() const { return m_RepeatCount; }
+        [[nodiscard]] inline uint16_t GetRepeatCount() const { return m_RepeatCount; }
         [[nodiscard]] std::string ToString() const override
         {
             std::stringstream ss;
@@ -34,13 +35,13 @@ namespace Aisite {
 
         EVENT_CLASS_TYPE(KeyPressed)
     private:
-        int m_RepeatCount;
+        uint16_t m_RepeatCount;
     };
 
     class AISITE_API KeyReleasedEvent final : public KeyEvent
     {
     public:
-        explicit KeyReleasedEvent(const int keycode): KeyEvent(keycode) {}
+        explicit KeyReleasedEvent(const KeyCode keycode): KeyEvent(keycode) {}
 
         [[nodiscard]] std::string ToString() const override
         {
@@ -53,19 +54,24 @@ namespace Aisite {
     };
 
 
-    class AISITE_API KeyTypedEvent : public KeyEvent
+    class AISITE_API KeyTypedEvent : public Event
     {
     public:
-        KeyTypedEvent(int keycode)
-            : KeyEvent(keycode) {}
+        explicit KeyTypedEvent(unsigned int unicode)
+            : m_Unicode(unicode) {}
+    public:
+        [[nodiscard]] inline unsigned int GetChar() const { return m_Unicode; }
+        EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
         std::string ToString() const override
         {
             std::stringstream ss;
-            ss << "KeyTypedEvent: " << m_KeyCode;
+            ss << "KeyTypedEvent: " << m_Unicode;
             return ss.str();
         }
 
         EVENT_CLASS_TYPE(KeyTyped)
+    protected:
+        unsigned int m_Unicode;
     };
 }

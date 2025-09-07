@@ -90,6 +90,7 @@ namespace Aisite
 
     void ImGuiLayer::OnAttach()
     {
+        AT_PROFILE_FUNCTION();
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
 
@@ -101,7 +102,9 @@ namespace Aisite
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // 开启多视口（拖出窗口外）
 
 
-        io.Fonts->AddFontFromMemoryTTF(&__gui_ttf, __gui_ttf_len, 15.0f);
+        ImFontConfig MasterFontConfig;
+        MasterFontConfig.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF(&__gui_ttf, __gui_ttf_len, 15.0f, &MasterFontConfig);
         ImFontConfig config;
         config.MergeMode = true; // 合并到上一个字体
         config.GlyphMinAdvanceX = 0.0f; // 避免影响原字体宽度
@@ -131,13 +134,27 @@ namespace Aisite
 
     void ImGuiLayer::OnDetach()
     {
+        AT_PROFILE_FUNCTION();
+
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
 
+    void ImGuiLayer::OnEvent(Event& e)
+    {
+        if (m_BlockEvents)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
+    }
+
     void ImGuiLayer::Begin()
     {
+        AT_PROFILE_FUNCTION();
+
         ImGui_ImplGlfw_NewFrame();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
@@ -145,6 +162,8 @@ namespace Aisite
 
     void ImGuiLayer::End()
     {
+        AT_PROFILE_FUNCTION();
+
         ImGuiIO& io = ImGui::GetIO();
         Application& app = Application::Get();
         io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());

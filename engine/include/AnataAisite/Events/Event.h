@@ -1,5 +1,4 @@
 #pragma once
-#include <_atpch.h>
 
 #include "AnataAisite/Core.h"
 

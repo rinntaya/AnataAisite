@@ -1,7 +1,9 @@
 
 #pragma once
 
-#include "AnataAisite/Log.h"
+#include "AnataAisite/Debug/Log.h"
+#include "AnataAisite/Debug/Instrumentor.h"
+
 
 #include <iostream>
 #include <memory>

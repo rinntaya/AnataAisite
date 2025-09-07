@@ -10,8 +10,14 @@ namespace Aisite {
 
     void Renderer::Init()
     {
+        AT_PROFILE_FUNCTION();
+
         RenderCommand::Init();
         Renderer2D::Init();
+    }
+    void Renderer::Shutdown()
+    {
+        Renderer2D::Shutdown();
     }
 
 
