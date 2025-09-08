@@ -6,7 +6,7 @@
 
 
 // ---Entry Point--------------------------
-extern Aisite::Application* Aisite::CreateApplication();
+extern Aisite::Application* Aisite::CreateApplication(ApplicationCommandLineArgs args);
 
 int main(int argc, char* argv[])
 {
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     AT_INFO("Hello from {}!", 1);
 
     AT_PROFILE_BEGIN_SESSION("Startup", "TracingProfile-Startup.json");
-    const auto app = Aisite::CreateApplication();
+    const auto app = Aisite::CreateApplication({ argc, argv });
     AT_PROFILE_END_SESSION();
 
     AT_PROFILE_BEGIN_SESSION("Runtime", "TracingProfile-Runtime.json");
@@ -34,4 +34,4 @@ int main(int argc, char* argv[])
 
 
 
-#define AISITE_APP(appClass) Aisite::Application* Aisite::CreateApplication() { return new appClass(); }
+#define AISITE_APP(appClass) Aisite::Application* Aisite::CreateApplication(ApplicationCommandLineArgs args) { return new appClass(args); }

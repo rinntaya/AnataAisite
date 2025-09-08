@@ -99,7 +99,8 @@ namespace Aisite
     }
 
 
-    Application::Application(const std::string& name)
+    Application::Application(const std::string& name, ApplicationCommandLineArgs args)
+        : m_CommandLineArgs(args)
     {
         AT_PROFILE_FUNCTION();
         AT_CORE_ASSERT(!s_Instance, "Application already exists!");

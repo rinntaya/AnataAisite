@@ -25,7 +25,7 @@ namespace Aisite {
 
         void NewScene();
         void OpenScene();
-        void SaveSceneAs();
+        void SaveSceneAs() const;
     private:
         Aisite::OrthographicCameraController m_CameraController;
 
@@ -51,7 +51,7 @@ namespace Aisite {
 
         bool m_ViewportFocused = false, m_ViewportHovered = false;
         glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-        glm::vec2 m_Runtime_ViewportSize = { 100.f, 100.f };
+        glm::vec2 m_Runtime_ViewportSize = { 0.f, 0.f };
 
         glm::vec2 m_ViewportBounds[2];
 

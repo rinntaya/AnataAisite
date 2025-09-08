@@ -4,6 +4,8 @@
 
 namespace Aisite {
 
+    class SceneHierarchyPanel;
+
     class AISITE_API Entity
     {
     public:

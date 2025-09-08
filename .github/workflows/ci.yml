@@ -19,6 +19,11 @@ jobs:
       - name: Set up MSVC developer environment
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Install Vulkan SDK
+        run: |
+          choco install vulkan-sdk --version=1.3.261.1 -y
+          refreshenv
+
       - name: Configure with CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 

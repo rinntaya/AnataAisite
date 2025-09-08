@@ -2,9 +2,9 @@
 
 #include "AnataAisite/Renderer/RenderCommand.h"
 #include "AnataAisite/Renderer/Shader.h"
+#include "AnataAisite/Renderer/UniformBuffer.h"
 #include "AnataAisite/Renderer/VertexArray.h"
 #include "glm/ext/matrix_transform.hpp"
-#include "platform/opengl/OpenGLShader.h"
 
 namespace Aisite
 {
@@ -35,15 +35,22 @@ namespace Aisite
         Ref<Shader> TextureShader;
         Ref<Texture2D> WhiteTexture;
 
+        glm::vec4 QuadVertexPositions[4];
         uint32_t QuadIndexCount = 0;
         QuadVertex* QuadVertexBufferBase = nullptr;
         QuadVertex* QuadVertexBufferPtr = nullptr;
 
         std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1; // 0 = white texture
-        glm::vec4 QuadVertexPositions[4];
 
     	Renderer2D::Statistics Stats;
+
+    	struct CameraData
+    	{
+    		glm::mat4 ViewProjection;
+    	};
+    	CameraData CameraBuffer;
+    	Ref<UniformBuffer> CameraUniformBuffer;
     };
 
 	Renderer2DStorage s_Data;
@@ -97,8 +104,8 @@ namespace Aisite
             samplers[i] = i;
 
         s_Data.TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-        s_Data.TextureShader->Bind();
-        s_Data.TextureShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
+        // s_Data.TextureShader->Bind();
+        // s_Data.TextureShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
         // Set all texture slots to 0
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
@@ -106,6 +113,8 @@ namespace Aisite
         s_Data.QuadVertexPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+    	s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DStorage::CameraData), 0);
     }
     void Renderer2D::Shutdown()
     {
@@ -130,10 +139,8 @@ namespace Aisite
     {
     	AT_PROFILE_FUNCTION();
 
-	    const glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
-
-    	s_Data.TextureShader->Bind();
-    	s_Data.TextureShader->SetMat4("u_ViewProjection", viewProj);
+    	s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+    	s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DStorage::CameraData));
 
     	StartBatch();
     }
@@ -141,8 +148,8 @@ namespace Aisite
     {
     	AT_PROFILE_FUNCTION();
 
-    	s_Data.TextureShader->Bind();
-    	s_Data.TextureShader->SetMat4("u_ViewProjection", viewProj);
+    	s_Data.CameraBuffer.ViewProjection = viewProj;
+    	s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DStorage::CameraData));
 
     	StartBatch();
     }
@@ -173,6 +180,7 @@ namespace Aisite
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
             s_Data.TextureSlots[i]->Bind(i);
 
+    	s_Data.TextureShader->Bind();
         RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
     	s_Data.Stats.DrawCalls++;

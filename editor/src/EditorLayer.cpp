@@ -30,18 +30,22 @@ namespace Aisite {
 		fbSpec.Attachments = {
 			FramebufferTextureFormat::RGBA8,
 			FramebufferTextureFormat::RED_INTEGER,
-			FramebufferTextureFormat::Depth };
+			FramebufferTextureFormat::Depth
+		};
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 		m_RuntimeFrame = Framebuffer::Create(fbSpec);
 
-		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-
 		m_ActiveScene = CreateRef<Scene>();
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		m_ActiveScene->OnViewportResize((uint32_t)m_Runtime_ViewportSize.x, (uint32_t)m_Runtime_ViewportSize.y);
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize("assets/scenes/Example.scene");
+
+		if (const auto commandLineArgs = Application::Get().GetCommandLineArgs(); commandLineArgs.Count > 1)
+		{
+			const auto sceneFilePath = commandLineArgs[1];
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(sceneFilePath);
+		}
+		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 
 #if 0
@@ -493,24 +497,24 @@ namespace Aisite {
 	}
 	void EditorLayer::OpenScene()
 	{
-		std::optional<std::string> filepath = FileDialogs::OpenFile("AnataAiste Scene (*.scene)\0*.scene\0");
-		if (filepath)
+		std::string filepath = FileDialogs::OpenFile("AnataAiste Scene (*.scene)\0*.scene\0");
+		if (!filepath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_Runtime_ViewportSize.x, (uint32_t)m_Runtime_ViewportSize.y);
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(*filepath);
+			serializer.Deserialize(filepath);
 		}
 	}
-	void EditorLayer::SaveSceneAs()
+	void EditorLayer::SaveSceneAs() const
 	{
-		std::optional<std::string> filepath = FileDialogs::SaveFile("AnataAiste Scene (*.scene)\0*.scene\0");
-		if (filepath)
+		std::string filepath = FileDialogs::SaveFile("AnataAiste Scene (*.scene)\0*.scene\0");
+		if (!filepath.empty())
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(*filepath);
+			serializer.Serialize(filepath);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
 project(Engine)
-find_package(Vulkan REQUIRED)
 
 set(HEADERS
         include/_atpch.h
@@ -86,6 +85,11 @@ set(SOURCES
         include/AnataAisite/Utils/PlatformUtils.h
         include/AnataAisite/Math/Math.cpp
         include/AnataAisite/Math/Math.h
+        include/AnataAisite/Debug/Timer.h
+        include/AnataAisite/Renderer/UniformBuffer.cpp
+        include/AnataAisite/Renderer/UniformBuffer.h
+        src/platform/opengl/OpenGLUniformBuffer.cpp
+        src/platform/opengl/OpenGLUniformBuffer.h
 )
 
 set(WINDOWS_FILES
@@ -142,7 +146,29 @@ target_include_directories(Engine
 )
 target_precompile_headers(Engine PUBLIC include/_atpch.h)
 
+find_package(Vulkan REQUIRED)
 target_link_libraries(Engine PRIVATE Vulkan::Vulkan)
+
+
+# Vulkan SDK
+set(VULKAN_SDK $ENV{VULKAN_SDK})
+set(LibraryDir_VulkanSDK "${VULKAN_SDK}/Lib")
+set(Libs_Debug
+        "${LibraryDir_VulkanSDK}/shaderc_sharedd.lib"
+        "${LibraryDir_VulkanSDK}/spirv-cross-cored.lib"
+        "${LibraryDir_VulkanSDK}/spirv-cross-glsld.lib"
+        "${LibraryDir_VulkanSDK}/SPIRV-Toolsd.lib"
+)
+set(Libs_Release
+        "${LibraryDir_VulkanSDK}/shaderc_shared.lib"
+        "${LibraryDir_VulkanSDK}/spirv-cross-core.lib"
+        "${LibraryDir_VulkanSDK}/spirv-cross-glsl.lib"
+)
+target_link_libraries(Engine PRIVATE
+        debug ${Libs_Debug}
+        optimized ${Libs_Release}
+)
+
 
 
 add_subdirectory(deps/spdlog)

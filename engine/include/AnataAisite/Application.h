@@ -10,10 +10,23 @@
 
 namespace Aisite
 {
+
+    struct AISITE_API ApplicationCommandLineArgs
+    {
+        int Count = 0;
+        char** Args = nullptr;
+
+        const char* operator[](int index) const
+        {
+            AT_CORE_ASSERT(index < Count);
+            return Args[index];
+        }
+    };
+
     class AISITE_API Application
     {
     public:
-        Application(const std::string& name = "Aisite Player");
+        Application(const std::string& name = "Aisite Player", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
         ~Application();
 
         void Run();
@@ -28,12 +41,15 @@ namespace Aisite
 
         void OnEvent(Event& e) ;
 
+        ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
+
     private:
         bool OnWindowClose(const WindowCloseEvent& _);
         bool OnWindowResize(WindowResizeEvent& e);
 
     private:
         static Application* s_Instance;
+        ApplicationCommandLineArgs m_CommandLineArgs;
 
         Scope<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
@@ -50,5 +66,5 @@ namespace Aisite
     };
 
 
-    Application* CreateApplication();
+    Application* CreateApplication(ApplicationCommandLineArgs args);
 }
