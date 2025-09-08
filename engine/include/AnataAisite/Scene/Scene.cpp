@@ -10,8 +10,6 @@
 namespace Aisite {
 
 
-
-
 	Scene::Scene()
 	{
 	}
@@ -28,8 +26,12 @@ namespace Aisite {
 		tag.Tag = name.empty() ? "Entity" : name;
 		return entity;
 	}
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_Registry.destroy(entity);
+	}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		// Update scripts
 		{
@@ -47,20 +49,18 @@ namespace Aisite {
 			});
 		}
 
-
-		// Render 2D
-		Camera* mainCamera = nullptr;
-		glm::mat4* cameraTransform = nullptr;
+		const Camera* mainCamera = nullptr;
+		glm::mat4 cameraTransform;
 		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
-			for (auto entity : view)
+			const auto view = m_Registry.view<TransformComponent, CameraComponent>();
+			for (const auto entity : view)
 			{
 				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
 
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraTransform = &transform.Transform;
+					cameraTransform = transform.GetTransform();
 					break;
 				}
 			}
@@ -68,20 +68,30 @@ namespace Aisite {
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, *cameraTransform);
-
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
-			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawQuad(transform, sprite.Color);
-			}
-
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+			OnUpdate(ts);
 			Renderer2D::EndScene();
 		}
 
 	}
+	void Scene::OnUpdateEditor(const Timestep ts, const glm::mat4& viewProj)
+	{
+		Renderer2D::BeginScene(viewProj);
+		OnUpdate(ts);
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdate(Timestep ts)
+	{
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+		}
+	};
+
 
 
 	void Scene::OnViewportResize(float width, float height)
@@ -98,6 +108,50 @@ namespace Aisite {
 				cameraComponent.Camera.SetViewportSize(width, height);
 		}
 
+	}
+
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		const auto view = m_Registry.view<CameraComponent>();
+		for (const auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.Primary)
+				return Entity{entity, this};
+		}
+		return {};
+	}
+
+	template<typename T>
+	AISITE_API void Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		// static_assert(false);
+	}
+
+	template<>
+	AISITE_API void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+	{
+	}
+
+	template<>
+	AISITE_API void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+	}
+
+	template<>
+	AISITE_API void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	}
+
+	template<>
+	AISITE_API void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
+	{
+	}
+
+	template<>
+	AISITE_API void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
 	}
 
 }

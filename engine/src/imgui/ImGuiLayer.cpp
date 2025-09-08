@@ -1,5 +1,6 @@
 #include "AnataAisite/ImGuiLayer.h"
 #include "font/gui.h"
+#include "font/gui_mono.h"
 
 
 #include "AnataAisite/Application.h"
@@ -8,6 +9,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <GLFW/glfw3.h>
 
 
@@ -68,16 +70,17 @@ void StyleColorsLightGreen(ImGuiStyle* dst)
     colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.000f, 0.000f, 0.000f, 0.586f);
     colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.000f, 0.000f, 0.000f, 0.586f);
 
-    style->ChildRounding = 4.0f;
+    style->ChildRounding = .0f;
     style->FrameBorderSize = 1.0f;
-    style->FrameRounding = 2.0f;
+    style->FrameRounding = .0f;
     style->GrabMinSize = 7.0f;
-    style->PopupRounding = 2.0f;
-    style->ScrollbarRounding = 12.0f;
-    style->ScrollbarSize = 13.0f;
+    style->PopupRounding = .0f;
+    style->ScrollbarRounding = .0f;
+    style->ScrollbarSize = 9.0f;
+    style->ScrollbarPadding = .1f;
     style->TabBorderSize = 1.0f;
     style->TabRounding = 0.0f;
-    style->WindowRounding = 4.0f;
+    style->WindowRounding = .0f;
 }
 
 namespace Aisite
@@ -104,11 +107,23 @@ namespace Aisite
 
         ImFontConfig MasterFontConfig;
         MasterFontConfig.FontDataOwnedByAtlas = false;
-        io.Fonts->AddFontFromMemoryTTF(&__gui_ttf, __gui_ttf_len, 15.0f, &MasterFontConfig);
+        io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.0f, &MasterFontConfig);
+        // io.Fonts->AddFontFromMemoryTTF(&__gui_ttf, __gui_ttf_len, 17.0f, &MasterFontConfig);
+        // 合并 Nerd Font 私用区
+        // 指定 PUAs 的范围
+        static const ImWchar icons_ranges[] = { 0xE000, 0xF8FF, 0 }; // 私用区
+        ImFontConfig icon_config;
+        icon_config.MergeMode = true;
+        icon_config.GlyphMinAdvanceX = 0.0f;
+        icon_config.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, 16.0f, &icon_config, icons_ranges);
+
         ImFontConfig config;
-        config.MergeMode = true; // 合并到上一个字体
+        // config.MergeMode = true; // 合并到上一个字体
         config.GlyphMinAdvanceX = 0.0f; // 避免影响原字体宽度
-        io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 15.0f, &config);
+        config.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, 16.0f, &config);
+
 
 
         ImGuiStyle& style = ImGui::GetStyle();
@@ -158,6 +173,7 @@ namespace Aisite
         ImGui_ImplGlfw_NewFrame();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void ImGuiLayer::End()

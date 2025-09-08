@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 project(Engine)
+find_package(Vulkan REQUIRED)
 
 set(HEADERS
         include/_atpch.h
@@ -80,12 +81,18 @@ set(SOURCES
         include/AnataAisite/Scene/ScriptableEntity.h
         include/AnataAisite/PlatformDetection.h
         include/AnataAisite/Debug/Assert.h
+        include/AnataAisite/Scene/SceneSerializer.cpp
+        include/AnataAisite/Scene/SceneSerializer.h
+        include/AnataAisite/Utils/PlatformUtils.h
+        include/AnataAisite/Math/Math.cpp
+        include/AnataAisite/Math/Math.h
 )
 
 set(WINDOWS_FILES
         src/platform/Windows/WindowsWindow.cpp
         src/platform/Windows/WindowsWindow.h
         src/platform/Windows/WindowsInput.cpp
+        src/platform/windows/WindowsPlatformUtils.cpp
 )
 set(UNIX_FILES
 
@@ -101,6 +108,8 @@ list(APPEND SOURCES
         deps/imgui/imgui_demo.cpp
         deps/imgui/backends/imgui_impl_opengl3.cpp
         deps/imgui/backends/imgui_impl_glfw.cpp
+
+        deps/ImGuizmo/ImGuizmo.cpp
 )
 
 add_library(Engine SHARED ${SOURCES} ${HEADERS})
@@ -127,11 +136,13 @@ target_include_directories(Engine
         PRIVATE src
         PRIVATE res
         PUBLIC vendor
+        PUBLIC deps/ImGuizmo
         PUBLIC deps/imgui
         PRIVATE deps/imgui/backends
 )
 target_precompile_headers(Engine PUBLIC include/_atpch.h)
 
+target_link_libraries(Engine PRIVATE Vulkan::Vulkan)
 
 
 add_subdirectory(deps/spdlog)
@@ -140,6 +151,8 @@ add_subdirectory(deps/glfw)
 target_link_libraries(Engine PRIVATE glfw)
 add_subdirectory(deps/glad)
 target_link_libraries(Engine PRIVATE glad)
+add_subdirectory(deps/yaml-cpp)
+target_link_libraries(Engine PRIVATE yaml-cpp)
 add_subdirectory(deps/glm)
 target_link_libraries(Engine PUBLIC  glm)
 

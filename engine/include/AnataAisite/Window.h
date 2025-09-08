@@ -16,7 +16,7 @@ namespace Aisite
         float XDpi, YDpi;
 
         explicit WindowProps(std::string  title = "AnataAisite Engine / お願いい！愛して！！！",
-                             const uint32_t width = 1280,
+                             const uint32_t width = 1280 + 200,
                              const uint32_t height = 720)
         : Title(std::move(title)), Width(width), Height(height)
         {
@@ -44,6 +44,6 @@ namespace Aisite
         virtual float GetDpi(float* vec2 = nullptr) = 0;
 
         virtual void* GetNativeWindow() const = 0;
-        static Ref<Window> Create(const WindowProps& props = WindowProps());
+        static Scope<Window> Create(const WindowProps& props = WindowProps());
     };
 }

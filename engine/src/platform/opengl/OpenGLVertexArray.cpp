@@ -1,4 +1,4 @@
-#include "OpenGLVertexArray.h"
+    #include "OpenGLVertexArray.h"
 
 #include <glad/glad.h>
 
@@ -11,6 +11,7 @@ namespace Aisite
             case ShaderDataType::Float2:
             case ShaderDataType::Float3:
             case ShaderDataType::Float4:
+
             case ShaderDataType::Mat3:
             case ShaderDataType::Mat4:
                 return GL_FLOAT;
@@ -75,6 +76,17 @@ namespace Aisite
                 case ShaderDataType::Float2:
                 case ShaderDataType::Float3:
                 case ShaderDataType::Float4:
+                {
+                    glEnableVertexAttribArray(index);
+                    glVertexAttribPointer(index,
+                        element.GetComponentCount(),
+                        ShaderDataTypeToOpenGLBaseType(element.Type),
+                        element.Normalized ? GL_TRUE : GL_FALSE,
+                        layout.GetStride(),
+                        (const void*)element.Offset);
+                    index++;
+                    break;
+                }
                 case ShaderDataType::Int:
                 case ShaderDataType::Int2:
                 case ShaderDataType::Int3:
@@ -82,10 +94,10 @@ namespace Aisite
                 case ShaderDataType::Bool:
                 {
                     glEnableVertexAttribArray(index);
-                    glVertexAttribPointer(index,
+                    glVertexAttribIPointer(index,
                         element.GetComponentCount(),
                         ShaderDataTypeToOpenGLBaseType(element.Type),
-                        element.Normalized ? GL_TRUE : GL_FALSE,
+                        // element.Normalized ? GL_TRUE : GL_FALSE,
                         layout.GetStride(),
                         (const void*)element.Offset);
                     index++;
