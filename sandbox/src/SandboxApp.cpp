@@ -7,7 +7,8 @@
 class Sandbox : public Aisite::Application
 {
 public:
-    Sandbox()
+    Sandbox(const Aisite::ApplicationCommandLineArgs args)
+        :Application("Sandbox", args)
     {
         PushLayer(new Sandbox2D());
     }

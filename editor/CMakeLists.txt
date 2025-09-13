@@ -10,7 +10,9 @@ add_executable(Editor src/AisiteEditor.cpp
         src/panels/SceneHierarchyPanel.cpp
         src/panels/SceneHierarchyPanel.h
         src/renderer/EditorCamera.cpp
-        src/renderer/EditorCamera.h)
+        src/renderer/EditorCamera.h
+        src/panels/ContentBrowserPanel.cpp
+        src/panels/ContentBrowserPanel.h)
 target_link_libraries(Editor PRIVATE Aisite::Engine)
 
 

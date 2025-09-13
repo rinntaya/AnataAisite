@@ -99,14 +99,19 @@ namespace Aisite
     }
 
 
-    Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-        : m_CommandLineArgs(args)
+    Application::Application(const ApplicationSpecification& specification)
+        : m_Specification(specification)
     {
         AT_PROFILE_FUNCTION();
         AT_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
-        m_Window = Window::Create(WindowProps(name));
+
+        // Set working directory here
+        if (!m_Specification.WorkingDirectory.empty())
+            std::filesystem::current_path(m_Specification.WorkingDirectory);
+
+        m_Window = Window::Create(WindowProps(m_Specification.Name));
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
         // m_Window->SetVSync(false);
 

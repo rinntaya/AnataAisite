@@ -34,4 +34,11 @@ int main(int argc, char* argv[])
 
 
 
-#define AISITE_APP(appClass) Aisite::Application* Aisite::CreateApplication(ApplicationCommandLineArgs args) { return new appClass(args); }
+#define AISITE_APP(name, appClass) Aisite::Application* Aisite::CreateApplication(ApplicationCommandLineArgs args)\
+{\
+    ApplicationSpecification spec;\
+    spec.Name = name;\
+    spec.WorkingDirectory = "./";\
+    spec.CommandLineArgs = args;\
+    return new appClass(spec);\
+}

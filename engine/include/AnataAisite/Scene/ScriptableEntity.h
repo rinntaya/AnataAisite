@@ -5,10 +5,10 @@
 
 namespace Aisite {
 
-    class ScriptableEntity
+    class AISITE_API ScriptableEntity
     {
     public:
-        virtual ~ScriptableEntity() {}
+        virtual ~ScriptableEntity() = default;
 
         template<typename T>
         T& GetComponent()

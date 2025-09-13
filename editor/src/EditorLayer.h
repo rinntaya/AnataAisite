@@ -1,6 +1,7 @@
 #pragma once
 #include "AnataAisite.h"
 #include "AnataAisite/Events/KeyEvent.h"
+#include "panels/ContentBrowserPanel.h"
 #include "panels/SceneHierarchyPanel.h"
 #include "renderer/EditorCamera.h"
 
@@ -22,41 +23,56 @@ namespace Aisite {
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+        void OnOverlayRender();
 
         void NewScene();
         void OpenScene();
-        void SaveSceneAs() const;
-    private:
-        Aisite::OrthographicCameraController m_CameraController;
+        void OpenScene(const std::filesystem::path& path);
+        void SaveScene();
+        void SaveSceneAs();
 
-        // Ref<VertexArray> m_SquareVA;
-        // Ref<Shader> m_FlatColorShader;
-        Ref<Framebuffer> m_Framebuffer;
+        void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
+
+
+        void OnScenePlay();
+        void OnSceneSimulate();
+        void OnSceneStop();
+
+        void OnDuplicateEntity() const;
+        // UI Panels
+        void UI_Toolbar();
+    private:
+        Ref<Framebuffer> m_EditorFrame;
+        Ref<Framebuffer> m_CameraFrame;
         Ref<Framebuffer> m_RuntimeFrame;
+
         EditorCamera m_EditorCamera;
 
         Ref<Scene> m_ActiveScene;
+        Ref<Scene> m_EditorScene;
+        std::filesystem::path m_EditorScenePath;
         Entity m_HoveredEntity;
 
-        // Entity m_SquareEntity;
-        // Entity m_CameraEntity;
-        // Entity m_SecondCamera;
-
-        // bool m_PrimaryCamera = true;
-
-
-
-
-        Ref<Texture2D> m_CheckerboardTexture;
-
         bool m_ViewportFocused = false, m_ViewportHovered = false;
-        glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-        glm::vec2 m_Runtime_ViewportSize = { 0.f, 0.f };
+        glm::vec2 m_Editor_ViewportSize  = { 100.f, 100.f };
+        glm::vec2 m_Camera_ViewportSize  = { 100.f, 100.f };
+        glm::vec2 m_Runtime_ViewportSize = { 100.f, 100.f };
 
-        glm::vec2 m_ViewportBounds[2];
+        glm::vec2 m_Editor_ViewportBounds[2];
 
-        int m_GizmoType = -1;
+        int m_GizmoType = 0b1111111111;
+        bool m_ShowPhysicsColliders = false;
+
+
+        enum class SceneState
+        {
+            Edit = 0, Play = 1, Simulate = 2
+        };
+        SceneState m_SceneState = SceneState::Edit;
+        Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
+
         SceneHierarchyPanel m_SceneHierarchyPanel;
+        ContentBrowserPanel m_ContentBrowserPanel;
     };
 
 } // Aisite

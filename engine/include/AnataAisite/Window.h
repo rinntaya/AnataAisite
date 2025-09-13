@@ -17,7 +17,7 @@ namespace Aisite
 
         explicit WindowProps(std::string  title = "AnataAisite Engine / お願いい！愛して！！！",
                              const uint32_t width = 1280 + 200,
-                             const uint32_t height = 720)
+                             const uint32_t height = 720 + 200)
         : Title(std::move(title)), Width(width), Height(height)
         {
         }

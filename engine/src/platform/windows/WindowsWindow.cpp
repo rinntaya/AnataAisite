@@ -102,6 +102,7 @@ namespace Aisite
 
         m_Window = glfwCreateWindow((int) (props.Width * m_DpiX), (int) (props.Height * m_DpiX),
                                     m_Data.Title.c_str(), nullptr, nullptr);
+        glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
         m_Context = new OpenGLContext(m_Window);
 
         int width, height, channels;
@@ -116,10 +117,13 @@ namespace Aisite
             stbi_image_free(pixels);
         }
 
+
+        {
         HWND hwnd = glfwGetWin32Window(m_Window);
         BOOL useDarkMode = TRUE;
         DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
-        // ImmAssociateContext(hwnd, NULL); // 禁用 IME
+        ImmAssociateContext(hwnd, nullptr); // 禁用 IME
+        }
 
         m_Context->Init();
         glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -149,7 +153,7 @@ namespace Aisite
 
             switch (action) {
                 case GLFW_PRESS: {
-                    KeyPressedEvent event(keycode, 0);
+                    KeyPressedEvent event(keycode);
                     data->EventCallback(event);
                     break;
                 }
@@ -159,7 +163,7 @@ namespace Aisite
                     break;
                 }
                 case GLFW_REPEAT: {
-                    KeyPressedEvent event(keycode, 1);
+                    KeyPressedEvent event(keycode, true);
                     data->EventCallback(event);
                     break;
                 }
@@ -198,12 +202,12 @@ namespace Aisite
             MouseScrolledEvent event(xoffset, yoffset);
             data->EventCallback(event);
         });
-        glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos) {
-            const WindowData* data = (WindowData *) glfwGetWindowUserPointer(window);
-
-            MouseMovedEvent event(xpos, ypos);
-            data->EventCallback(event);
-        });
+        // glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos) {
+        //     const WindowData* data = (WindowData *) glfwGetWindowUserPointer(window);
+        //
+        //     MouseMovedEvent event(xpos, ypos);
+        //     data->EventCallback(event);
+        // });
     }
     void WindowsWindow::Shutdown()
     {

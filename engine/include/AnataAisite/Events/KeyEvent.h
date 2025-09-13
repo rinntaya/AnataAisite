@@ -22,20 +22,20 @@ namespace Aisite {
     class AISITE_API KeyPressedEvent final : public KeyEvent
     {
     public:
-        KeyPressedEvent(const KeyCode keycode, uint16_t repeatCount)
-            : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+        KeyPressedEvent(const KeyCode keycode, bool isRepeat = false)
+            : KeyEvent(keycode), m_IsRepeat(isRepeat) {}
 
-        [[nodiscard]] inline uint16_t GetRepeatCount() const { return m_RepeatCount; }
-        [[nodiscard]] std::string ToString() const override
+        bool IsRepeat() const { return m_IsRepeat; }
+        std::string ToString() const override
         {
             std::stringstream ss;
-            ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+            ss << "KeyPressedEvent: " << m_KeyCode << " (repeat = " << m_IsRepeat << " repeats)";
             return ss.str();
         }
 
         EVENT_CLASS_TYPE(KeyPressed)
     private:
-        uint16_t m_RepeatCount;
+        uint16_t m_IsRepeat;
     };
 
     class AISITE_API KeyReleasedEvent final : public KeyEvent

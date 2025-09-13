@@ -1,0 +1,186 @@
+Scene: Untitled
+Entities:
+  - Entity: 1598144355425499102
+    TagComponent:
+      Tag: Circle A
+    TransformComponent:
+      Translation: [1.5658146, 1.692058, 2.9802322e-08]
+      Rotation: [0, 0, 0]
+      Scale: [0.25, 0.25, 0.25]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.005
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 3080482715631585656
+    TagComponent:
+      Tag: Circle A
+    TransformComponent:
+      Translation: [4.602112, 0.20097989, -5.820766e-11]
+      Rotation: [0, 0, 0]
+      Scale: [0.25, 0.25, 0.25]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.005
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 17308022200736858785
+    TagComponent:
+      Tag: Circle A
+    TransformComponent:
+      Translation: [1.5658146, 1.692058, 2.9802322e-08]
+      Rotation: [0, 0, 0]
+      Scale: [0.25, 0.25, 0.25]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.005
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 15794977353402102560
+    TagComponent:
+      Tag: Circle
+    TransformComponent:
+      Translation: [3.156527, -1.6707844, -0.046386722]
+      Rotation: [0, 0, 0]
+      Scale: [2.5, 2.5, 2.5]
+    CircleRendererComponent:
+      Color: [0, 1, 0.92156863, 1]
+      Thickness: 0.05
+      Fade: 0.002
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 5134011587522944740
+    TagComponent:
+      Tag: Floor Right
+    TransformComponent:
+      Translation: [2.3506453, -1.8453996, 0.01]
+      Rotation: [0, 0, 0.60369253]
+      Scale: [6.7419696, 0.46067816, 1]
+    SpriteRendererComponent:
+      Color: [0.4993625, 0.47697547, 0.6608696, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 10150967761619418601
+    TagComponent:
+      Tag: Circle A
+    TransformComponent:
+      Translation: [4.602112, 0.20097989, -5.820766e-11]
+      Rotation: [0, 0, 0]
+      Scale: [0.25, 0.25, 0.25]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.005
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 2356847504988585413
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 0, 8]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 16672940118998907085
+    TagComponent:
+      Tag: Floor Left
+    TransformComponent:
+      Translation: [-0.8831757, -1.0944793, 0]
+      Rotation: [0, 0, -0.638996]
+      Scale: [6.7419677, 0.46067813, 1]
+    SpriteRendererComponent:
+      Color: [0.11762234, 0.19152, 0.7246377, 1]
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 2973034868474745886
+    TagComponent:
+      Tag: Sprite
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.3611597, 0.37557203, 0.84813577]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\textures\Checkerboard.png
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.88
+      Friction: 0.1
+      Restitution: 0.82
+      RestitutionThreshold: 0.5

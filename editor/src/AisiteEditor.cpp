@@ -8,8 +8,8 @@ namespace Aisite
     class AisiteEditor : public Application
     {
     public:
-        AisiteEditor(const ApplicationCommandLineArgs args)
-            : Application("AnataAisite Editor / 人間は嫌い", args)
+        AisiteEditor(const ApplicationSpecification& spec)
+            : Application(spec)
         {
             PushLayer(new EditorLayer());
         }
@@ -17,4 +17,4 @@ namespace Aisite
     };
 }
 
-AISITE_APP(::Aisite::AisiteEditor);
+AISITE_APP("AnataAisite Editor / 人間は嫌い", ::Aisite::AisiteEditor);

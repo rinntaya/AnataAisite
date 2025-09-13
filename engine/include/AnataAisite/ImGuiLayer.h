@@ -25,7 +25,6 @@ namespace Aisite {
         void BlockEvents(bool block) { m_BlockEvents = block; }
     private:
         bool m_BlockEvents = true;
-        float m_Time = 0.0f;
         float m_Fps = 60.0f; // 初始值可设为60
         const float kAlpha = 0.1f; // 平滑系数
     };

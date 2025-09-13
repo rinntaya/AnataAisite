@@ -72,7 +72,6 @@ namespace Aisite {
 			AT_CORE_ASSERT(false);
 			return "";
 		}
-
 		static const char* GLShaderStageCachedVulkanFileExtension(uint32_t stage)
 		{
 			switch (stage)
@@ -85,53 +84,6 @@ namespace Aisite {
 		}
 
 
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& filepath)
-		: m_FilePath(filepath)
-	{
-		AT_PROFILE_FUNCTION();
-
-		Utils::CreateCacheDirectoryIfNeeded();
-
-		std::string source = ReadFile(filepath);
-		auto shaderSources = PreProcess(source);
-
-		{
-			Timer timer;
-			CompileOrGetVulkanBinaries(shaderSources);
-			CompileOrGetOpenGLBinaries();
-			CreateProgram();
-			AT_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
-		}
-
-		// Extract name from filepath
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		auto lastDot = filepath.rfind('.');
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-		m_Name = filepath.substr(lastSlash, count);
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-		: m_Name(name)
-	{
-		AT_PROFILE_FUNCTION();
-
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSrc;
-		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
-
-		CompileOrGetVulkanBinaries(sources);
-		CompileOrGetOpenGLBinaries();
-		CreateProgram();
-	}
-
-	OpenGLShader::~OpenGLShader()
-	{
-		AT_PROFILE_FUNCTION();
-
-		glDeleteProgram(m_RendererID);
 	}
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
@@ -162,7 +114,6 @@ namespace Aisite {
 
 		return result;
 	}
-
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
 		AT_PROFILE_FUNCTION();
@@ -190,10 +141,54 @@ namespace Aisite {
 		return shaderSources;
 	}
 
+	OpenGLShader::OpenGLShader(const std::string& filepath)
+		: m_FilePath(filepath)
+	{
+		AT_PROFILE_FUNCTION();
+
+		Utils::CreateCacheDirectoryIfNeeded();
+
+		std::string source = ReadFile(filepath);
+		auto shaderSources = PreProcess(source);
+
+		{
+			Timer timer;
+			CompileOrGetVulkanBinaries(shaderSources);
+			CompileOrGetOpenGLBinaries();
+			CreateProgram();
+			AT_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
+		}
+
+		// Extract name from filepath
+		auto lastSlash = filepath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filepath.rfind('.');
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = filepath.substr(lastSlash, count);
+	}
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+		: m_Name(name)
+	{
+		AT_PROFILE_FUNCTION();
+
+		std::unordered_map<GLenum, std::string> sources;
+		sources[GL_VERTEX_SHADER] = vertexSrc;
+		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+
+		CompileOrGetVulkanBinaries(sources);
+		CompileOrGetOpenGLBinaries();
+		CreateProgram();
+	}
+	OpenGLShader::~OpenGLShader()
+	{
+		AT_PROFILE_FUNCTION();
+
+		glDeleteProgram(m_RendererID);
+	}
+
+
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
-		GLuint program = glCreateProgram();
-
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
@@ -246,7 +241,6 @@ namespace Aisite {
 		for (auto&& [stage, data]: shaderData)
 			Reflect(stage, data);
 	}
-
 	void OpenGLShader::CompileOrGetOpenGLBinaries()
 	{
 		auto& shaderData = m_OpenGLSPIRV;
@@ -283,6 +277,29 @@ namespace Aisite {
 				spirv_cross::CompilerGLSL glslCompiler(spirv);
 				m_OpenGLSourceCode[stage] = glslCompiler.compile();
 				auto& source = m_OpenGLSourceCode[stage];
+
+				{
+					try
+					{
+						std::filesystem::path glslCachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage) + ".glsl");
+						std::ofstream outGLSL(glslCachedPath, std::ios::out | std::ios::binary);
+						if (outGLSL.is_open())
+						{
+							outGLSL.write(source.data(), (std::streamsize)source.size());
+							outGLSL.flush();
+							outGLSL.close();
+						}
+						else
+						{
+							AT_CORE_WARN("Could not write GLSL cache file: {0}", glslCachedPath.string());
+						}
+					}
+					catch (const std::exception& e)
+					{
+						AT_CORE_WARN("Exception while writing GLSL cache: {0}", e.what());
+					}
+
+				}
 
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str());
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
@@ -376,7 +393,6 @@ namespace Aisite {
 
 		glUseProgram(m_RendererID);
 	}
-
 	void OpenGLShader::Unbind() const
 	{
 		AT_PROFILE_FUNCTION();
@@ -384,99 +400,85 @@ namespace Aisite {
 		glUseProgram(0);
 	}
 
+
 	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformInt(name, value);
 	}
-
 	void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count)
 	{
 		UploadUniformIntArray(name, values, count);
 	}
-
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformFloat(name, value);
 	}
-
 	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformFloat2(name, value);
 	}
-
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformFloat3(name, value);
 	}
-
 	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformFloat4(name, value);
 	}
-
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
 		AT_PROFILE_FUNCTION();
 
 		UploadUniformMat4(name, value);
 	}
-
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
 	}
-
 	void OpenGLShader::UploadUniformIntArray(const std::string& name, int* values, uint32_t count)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1iv(location, count, values);
 	}
-
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1f(location, value);
 	}
-
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform2f(location, value.x, value.y);
 	}
-
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform3f(location, value.x, value.y, value.z);
 	}
-
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
-
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
-
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
-
 }

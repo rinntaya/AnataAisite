@@ -9,6 +9,8 @@
 
 #include <cstring>
 
+#include "ContentBrowserPanel.h"
+
 /* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
  * the following definition to disable a security warning on std::strncpy().
  */
@@ -19,6 +21,10 @@
 
 namespace Aisite
 {
+
+	extern const std::filesystem::path g_AssetPath;
+
+
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context)
     {
         SetContext(context);
@@ -32,36 +38,46 @@ namespace Aisite
 
     void SceneHierarchyPanel::OnImGuiRender()
     {
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12, 4.f)); // 节点按钮内部 padding 大
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 4)); // 窗口无 padding
-
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.40f, 0.40f, 0.40f, 1.0f));
-        ImGui::Begin("Scene Hierarchy");
-        ImGui::PopStyleVar();
-
-        for (const auto entity: m_Context->m_Registry.view<entt::entity>()) {
-            const Entity e{entity, m_Context.get()};
-            DrawEntityNode(e);
-        }
-        // if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-        //     m_SelectionContext = {};
-
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(3);
-
-        // Right-click on blank space
-        if (ImGui::BeginPopupContextWindow("Scene Tree Context", ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight))
         {
-            if (ImGui::MenuItem("Create Empty Entity"))
-                m_Context->CreateEntity("Empty Entity");
+        	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12, 5.f)); // 节点按钮内部 padding 大
+        	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 4)); // 窗口无 padding
 
-            ImGui::EndPopup();
+        	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
+
+        	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
+        	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+        	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.40f, 0.40f, 0.40f, 1.0f));
+        	ImGui::Begin("Scene Hierarchy");
+        	ImGui::PopStyleVar();
+
+
+        	if (m_Context)
+        	{
+        		for (const auto entity: m_Context->m_Registry.view<entt::entity>()) {
+        			const Entity e{entity, m_Context.get()};
+        			DrawEntityNode(e);
+        		}
+
+        		// if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+        		// 	m_SelectionContext = {};
+
+        	}
+        		ImGui::PopStyleVar();
+        		ImGui::PopStyleColor(3);
+
+        		// Right-click on blank space
+        		if (ImGui::BeginPopupContextWindow("Scene Tree Context", ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight))
+        		{
+        			if (ImGui::MenuItem("Create Empty Entity"))
+        				m_Context->CreateEntity("Empty Entity");
+
+        			ImGui::EndPopup();
+        		}
+
+
+        	ImGui::End();
+        	ImGui::PopStyleColor();
         }
-
-
-        ImGui::End();
 
     	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // 节点之间无缝隙
     	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 4)); // 窗口无 padding
@@ -93,7 +109,6 @@ namespace Aisite
         {
             if (ImGui::MenuItem("Delete Entity"))
                 entityDeleted = true;
-
             ImGui::EndPopup();
         }
     	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // 节点之间无缝隙
@@ -114,8 +129,6 @@ namespace Aisite
 		}
     	ImGui::PopStyleVar();
     }
-
-
     static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, const float columnWidth = 88.0f)
     {
         ImGui::PushID(label.c_str());
@@ -180,6 +193,7 @@ namespace Aisite
 
 
 
+
     template<typename T, typename UIFunction>
     static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
     {
@@ -218,7 +232,7 @@ namespace Aisite
             {
             	ImGui::Dummy({0.f, 12.f});
                 uiFunction(component);
-            	ImGui::Dummy({0.f, 16.f});
+            	ImGui::Dummy({0.f, 20.f});
             	ImGui::TreePop();
             }
         	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // 节点之间无缝隙
@@ -300,10 +314,7 @@ namespace Aisite
 					camera.SetPerspectiveFarClip(perspectiveFar);
 			}
 
-
 			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
-
-
 
 			{
 				float orthoSize = camera.GetOrthographicSize();
@@ -313,7 +324,6 @@ namespace Aisite
 				float orthoNear = camera.GetOrthographicNearClip();
 				if (ImGui::DragFloat("Near", &orthoNear))
 					camera.SetOrthographicNearClip(orthoNear);
-
 
 
 				float orthoFar = camera.GetOrthographicFarClip();
@@ -330,45 +340,110 @@ namespace Aisite
 		DrawComponent<SpriteRendererComponent>	("  Sprite Renderer",	entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					if (const auto *meta = (ContentMeta*)payload->Data; meta->type == ContentType::Texture)
+						component.Texture = Texture2D::Create(meta->path.string());
+				ImGui::EndDragDropTarget();
+			}
+
+
+			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+		});
+    	DrawComponent<CircleRendererComponent>  ("  Circle Renderer",  entity, [](auto& component)
+		{
+			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
+			ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
+		});
+    	DrawComponent<Rigidbody2DComponent>     ("◬  Rigidbody 2D",        entity, [](auto& component)
+			{
+				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
+				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+						if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+						{
+							currentBodyTypeString = bodyTypeStrings[i];
+							component.Type = (Rigidbody2DComponent::BodyType)i;
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+			});
+    	DrawComponent<BoxCollider2DComponent>   ("■  Box Collider 2D",     entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
+		});
+    	DrawComponent<CircleCollider2DComponent>("●  Circle Collider 2D", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat("Radius", &component.Radius);
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 		});
 
-    	ImGui::Separator();
 
 
-    	ImGui::Dummy(ImVec2(0.0f, 15.0f));
-        constexpr float margin = 10.0f;
-        const float lineWidth = ImGui::GetContentRegionAvail().x - margin * 2.0f;
-    	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
-    	if (ImGui::Button("Add Component", ImVec2(lineWidth, 0)))
-    		ImGui::OpenPopup("AddComponent");
+	    {
+		    ImGui::Separator();
+    		ImGui::Dummy(ImVec2(0.0f, 15.0f));
+    		constexpr float margin = 10.0f;
+    		const float lineWidth = ImGui::GetContentRegionAvail().x - margin * 2.0f;
+    		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
+    		if (ImGui::Button("Add Component", ImVec2(lineWidth, 0)))
+    			ImGui::OpenPopup("AddComponent");
 
-    	ImGui::PopStyleVar();
-    	if (ImGui::BeginPopup("AddComponent"))
-    	{
-    		if (ImGui::MenuItem("Camera"))
+    		ImGui::PopStyleVar();
+    		if (ImGui::BeginPopup("AddComponent"))
     		{
-    			if (!m_SelectionContext.HasComponent<CameraComponent>())
-    				m_SelectionContext.AddComponent<CameraComponent>();
-    			else
-    				AT_CORE_WARN("This entity already has the Camera Component!");
-    			ImGui::CloseCurrentPopup();
+    			DisplayAddComponentEntry<CameraComponent>("Camera");
+    			ImGui::Text("|+| renderer >");
+    			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
+    			DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
+    			ImGui::Text("|+| physics >");
+    			DisplayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
+    			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
+    			DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
+
+    			ImGui::EndPopup();
     		}
-
-    		if (ImGui::MenuItem("Sprite Renderer"))
-    		{
-    			if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
-    				m_SelectionContext.AddComponent<SpriteRendererComponent>();
-    			else
-    				AT_CORE_WARN("This entity already has the Sprite Renderer Component!");
-    			ImGui::CloseCurrentPopup();
-    		}
-    		ImGui::EndPopup();
-    	}
-    	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // 节点之间无缝隙
+    		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // 节点之间无缝隙
 
 
-    	ImGui::Dummy(ImVec2(0.0f, 20.0f));
+    		ImGui::Dummy(ImVec2(0.0f, 20.0f));
+	    }
 
     }
 
+	template<typename T>
+	void SceneHierarchyPanel::DisplayAddComponentEntry(const char* id)
+    {
+    	if (!m_SelectionContext.HasComponent<T>())
+    	{
+    		if (ImGui::MenuItem(id))
+    		{
+    			m_SelectionContext.AddComponent<T>();
+    			ImGui::CloseCurrentPopup();
+    		}
+    	}
+    }
 } // Aisite

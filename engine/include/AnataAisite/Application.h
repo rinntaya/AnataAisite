@@ -23,10 +23,17 @@ namespace Aisite
         }
     };
 
+    struct AISITE_API ApplicationSpecification
+    {
+        std::string Name = "AnataAisite Game";
+        std::string WorkingDirectory;
+        ApplicationCommandLineArgs CommandLineArgs;
+    };
+
     class AISITE_API Application
     {
     public:
-        Application(const std::string& name = "Aisite Player", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+        Application(const ApplicationSpecification& specification);
         ~Application();
 
         void Run();
@@ -38,10 +45,12 @@ namespace Aisite
         inline Window& GetWindow() const { return *m_Window; }
         ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
         inline static Application& Get() { return *s_Instance; }
+        const ApplicationSpecification& GetSpecification() const { return m_Specification; }
+
 
         void OnEvent(Event& e) ;
 
-        ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
+        ApplicationCommandLineArgs GetCommandLineArgs() const { return m_Specification.CommandLineArgs; }
 
     private:
         bool OnWindowClose(const WindowCloseEvent& _);
@@ -49,7 +58,8 @@ namespace Aisite
 
     private:
         static Application* s_Instance;
-        ApplicationCommandLineArgs m_CommandLineArgs;
+
+        ApplicationSpecification m_Specification;
 
         Scope<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;

@@ -19,6 +19,9 @@ namespace Aisite {
     private:
         void DrawEntityNode(Entity entity);
         void DrawComponents(Entity entity);
+        template<class T>
+        void DisplayAddComponentEntry(const char *id);
+
     private:
         Ref<Scene> m_Context;
         Entity m_SelectionContext;

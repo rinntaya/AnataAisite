@@ -105,9 +105,12 @@ namespace Aisite
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // 开启多视口（拖出窗口外）
 
 
+        float fontSize = 16.0f;// *2.0f;
+
+
         ImFontConfig MasterFontConfig;
         MasterFontConfig.FontDataOwnedByAtlas = false;
-        io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.0f, &MasterFontConfig);
+        io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", fontSize, &MasterFontConfig);
         // io.Fonts->AddFontFromMemoryTTF(&__gui_ttf, __gui_ttf_len, 17.0f, &MasterFontConfig);
         // 合并 Nerd Font 私用区
         // 指定 PUAs 的范围
@@ -116,13 +119,13 @@ namespace Aisite
         icon_config.MergeMode = true;
         icon_config.GlyphMinAdvanceX = 0.0f;
         icon_config.FontDataOwnedByAtlas = false;
-        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, 16.0f, &icon_config, icons_ranges);
+        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, fontSize, &icon_config, icons_ranges);
 
         ImFontConfig config;
         // config.MergeMode = true; // 合并到上一个字体
         config.GlyphMinAdvanceX = 0.0f; // 避免影响原字体宽度
         config.FontDataOwnedByAtlas = false;
-        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, 16.0f, &config);
+        io.Fonts->AddFontFromMemoryTTF(&__gui_mono_ttf, __gui_mono_ttf_len, fontSize, &config);
 
 
 

@@ -18,3 +18,7 @@
 [submodule "engine/deps/ImGuizmo"]
 	path = engine/deps/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+
+[submodule "engine/deps/box2d"]
+	path = engine/deps/box2d
+	url = https://github.com/thecherno/box2d.git

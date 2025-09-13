@@ -73,6 +73,7 @@ set(SOURCES
         include/AnataAisite/Scene/Scene.cpp
         include/AnataAisite/Scene/Scene.h
         include/AnataAisite/Scene/Components.h
+        include/AnataAisite/Scene/Components.cpp
         include/AnataAisite/Scene/Entity.cpp
         include/AnataAisite/Scene/Entity.h
         include/AnataAisite/Scene/SceneCamera.cpp
@@ -90,6 +91,8 @@ set(SOURCES
         include/AnataAisite/Renderer/UniformBuffer.h
         src/platform/opengl/OpenGLUniformBuffer.cpp
         src/platform/opengl/OpenGLUniformBuffer.h
+        include/AnataAisite/Utils/UUID.cpp
+        include/AnataAisite/Utils/UUID.h
 )
 
 set(WINDOWS_FILES
@@ -165,11 +168,9 @@ set(Libs_Release
         "${LibraryDir_VulkanSDK}/spirv-cross-glsl.lib"
 )
 target_link_libraries(Engine PRIVATE
-        debug ${Libs_Debug}
-        optimized ${Libs_Release}
+        $<$<CONFIG:Debug>:${Libs_Debug}>
+        $<$<CONFIG:Release>:${Libs_Release}>
 )
-
-
 
 add_subdirectory(deps/spdlog)
 target_link_libraries(Engine PUBLIC spdlog::spdlog)
@@ -181,6 +182,8 @@ add_subdirectory(deps/yaml-cpp)
 target_link_libraries(Engine PRIVATE yaml-cpp)
 add_subdirectory(deps/glm)
 target_link_libraries(Engine PUBLIC  glm)
+add_subdirectory(deps/box2d)
+target_link_libraries(Engine PRIVATE box2d)
 
 #add_library(imgui
 #        deps/imgui/imgui.cpp
